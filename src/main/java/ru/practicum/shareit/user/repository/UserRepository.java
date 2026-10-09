@@ -7,70 +7,18 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
-@Repository
-public class UserRepository {
-    private Map<Long, User> userStorage = new HashMap<>();
 
-    public List<User> getUsers() {
-        return new ArrayList<>(userStorage.values());
-    }
+public interface UserRepository {
 
-    public Optional<User> getUserById(long userId) {
-        return Optional.ofNullable(userStorage.get(userId));
-    }
+    public List<User> getUsers();
 
-    public User createUser(User user) {
-        checkEmailUnique(user);
-        user.setId(getNextId());
-        userStorage.put(user.getId(), user);
-        return user;
-    }
+    public Optional<User> getUserById(long userId);
 
-    public User update(User newUser) {
-        if (newUser.getId() == null) {
-            throw new ConditionsNotMetException("Id должен быть указан");
-        }
-        checkEmailUnique(newUser);
-        User oldUser = userStorage.get(newUser.getId());
-        if (oldUser == null) {
-            throw new ConditionsNotMetException("Пользователь не найден");
-        }
-        if (newUser.getEmail() != null) {
-            oldUser.setEmail(newUser.getEmail());
-        }
-        if (newUser.getName() != null) {
-            oldUser.setName(newUser.getName());
-        }
+    public User createUser(User user);
 
-        userStorage.put(oldUser.getId(), oldUser);
-        return oldUser;
-    }
 
-    public User deleteUser(User user) {
-        if (user.getId() == null) {
-            throw new ConditionsNotMetException("Id должен быть указан");
-        }
-        userStorage.remove(user.getId());
-        return user;
-    }
+    public User update(User newUser);
 
-    private long getNextId() {
-        long currentMaxId = userStorage.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
-
-    public void checkEmailUnique(User user) {
-        boolean emailExists = userStorage.values().stream()
-                .anyMatch(existingUser -> existingUser.getEmail().equalsIgnoreCase(user.getEmail())
-                        && !existingUser.getId().equals(user.getId()));
-
-        if (emailExists) {
-            throw new DuplicateDataException("Этот email уже используется");
-        }
-    }
+    public User deleteUser(User user);
 
 }

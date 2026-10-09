@@ -8,6 +8,7 @@ import ru.practicum.shareit.request.ItemRequest;
  */
 @Data
 public class ItemDto {
+    private Long id;
     private String name;
     private String description;
     private boolean available;

@@ -13,8 +13,6 @@ import lombok.EqualsAndHashCode;
 public class User {
     private Long id;
     private String name;
-    @NotBlank(message = "Почта не может быть пустой.")
-    @Email(message = "Почта должна соответствовать формату.")
     private String email;
 
 }

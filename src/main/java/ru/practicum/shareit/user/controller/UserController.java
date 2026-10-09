@@ -1,13 +1,12 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.UpdateUserRequest;
+import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.dto.NewUserRequest;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;

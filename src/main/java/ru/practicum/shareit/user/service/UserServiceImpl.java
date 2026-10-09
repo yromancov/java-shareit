@@ -2,39 +2,50 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ConditionsNotMetException;
-import ru.practicum.shareit.exception.DuplicateDataException;
-import ru.practicum.shareit.item.dto.UpdateUserRequest;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.dto.NewUserRequest;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+
     @Override
     public UserDto createUser(NewUserRequest userRequest) {
-    userRepository.createUser(userRequest);
+        User user = UserMapper.toUser(userRequest);
+        User saved = userRepository.createUser(user);
+        return UserMapper.toUserDto(saved);
     }
 
     @Override
     public List<UserDto> getUsers() {
-        return List.of();
+        return userRepository.getUsers().stream()
+                .map(UserMapper::toUserDto)
+                .toList();
     }
 
     @Override
     public UserDto getUserById(long userId) {
-        return null;
+        return userRepository.getUserById(userId)
+                .map(UserMapper::toUserDto)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id= " + userId + " не найден"));
+
     }
 
     @Override
     public UserDto updateUser(long userId, UpdateUserRequest userRequest) {
-        return null;
+        User user = userRepository.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id= " + userId + " не найден"));
+        UserMapper.updateUserFields(user, userRequest);
+        return UserMapper.toUserDto(userRepository.update(user));
+
     }
 
     @Override
