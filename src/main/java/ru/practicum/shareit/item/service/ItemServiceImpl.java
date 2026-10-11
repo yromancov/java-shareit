@@ -1,33 +1,69 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.NewItemRequest;
+import ru.practicum.shareit.item.dto.UpdateItemRequest;
+import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
-public class ItemServiceImpl implements ItemService{
+@Service
+@RequiredArgsConstructor
+public class ItemServiceImpl implements ItemService {
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+
+
     @Override
-    public List<ItemDto> getItems() {
-        return List.of();
+    public ItemDto getItemById(long itemId) {
+        return itemRepository.getItemById(itemId)
+                .map(ItemMapper::toItemDto)
+                .orElseThrow(() -> new NotFoundException("Вещь " + itemId + " не найдена"));
     }
 
     @Override
-    public ItemDto getItem(long itemId) {
-        return null;
+    public List<ItemDto> getItemsByOwner(long userId) {
+        return itemRepository.getItemsByOwnerId(userId)
+                .stream().map(ItemMapper::toItemDto)
+                .toList();
     }
 
     @Override
-    public ItemDto createItem(Long userId, NewItemRequest itemRequest) {
-        return null;
+    public List<ItemDto> searchItems(String text) {
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
+        return itemRepository.search(text).stream()
+                .map(ItemMapper::toItemDto)
+                .toList();
     }
 
     @Override
-    public ItemDto editItem(Long itemId) {
-        return null;
+    public ItemDto createItem(long userId, NewItemRequest itemRequest) {
+        User owner = userRepository.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь " + userId + " не найден"));
+        Item item = ItemMapper.toItem(itemRequest);
+        item.setOwner(owner);
+        return ItemMapper.toItemDto(itemRepository.createItem(item));
     }
 
     @Override
-    public ItemDto searchItem(String text) {
-        return null;
+    public ItemDto editItem(long userId, long itemId, UpdateItemRequest request) {
+        Item item = itemRepository.getItemById(itemId)
+                .orElseThrow(() -> new NotFoundException("Вещь " + itemId + " не найдена"));
+        if (!item.getOwner().getId().equals(userId)) {
+            throw new NotFoundException("Редактировать вещь может только владелец");
+        }
+        ItemMapper.updateItemFields(item, request);
+        return ItemMapper.toItemDto(itemRepository.update(item));
     }
+
+
 }

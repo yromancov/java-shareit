@@ -50,6 +50,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(long userId) {
-
+        userRepository.deleteUser(userId);
     }
 }

@@ -51,12 +51,11 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User deleteUser(User user) {
-        if (user.getId() == null) {
+    public void deleteUser(Long userId) {
+        if (userId == null) {
             throw new ConditionsNotMetException("Id должен быть указан");
         }
-        userStorage.remove(user.getId());
-        return user;
+        userStorage.remove(userId);
     }
 
     private long getNextId() {
