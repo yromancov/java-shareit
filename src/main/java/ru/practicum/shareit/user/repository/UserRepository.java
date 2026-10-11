@@ -1,8 +1,6 @@
 package ru.practicum.shareit.user.repository;
 
-import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.ConditionsNotMetException;
-import ru.practicum.shareit.exception.DuplicateDataException;
+
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;

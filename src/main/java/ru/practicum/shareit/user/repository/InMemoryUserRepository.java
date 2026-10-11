@@ -6,6 +6,7 @@ import ru.practicum.shareit.exception.DuplicateDataException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
+
 @Repository
 public class InMemoryUserRepository implements UserRepository {
     private Map<Long, User> userStorage = new HashMap<>();
