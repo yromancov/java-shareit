@@ -20,13 +20,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(NewUserRequest userRequest) {
         User user = UserMapper.toUser(userRequest);
-        User saved = userRepository.createUser(user);
+        User saved = userRepository.save(user);
         return UserMapper.toUserDto(saved);
     }
 
     @Override
     public List<UserDto> getUsers() {
-        return userRepository.getUsers().stream()
+        return userRepository.findAll().stream()
                 .map(UserMapper::toUserDto)
                 .toList();
     }
