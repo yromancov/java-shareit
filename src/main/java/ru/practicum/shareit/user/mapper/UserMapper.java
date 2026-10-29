@@ -2,8 +2,6 @@ package ru.practicum.shareit.user.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.user.dto.NewUserRequest;
-import ru.practicum.shareit.user.dto.UpdateUserRequest;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -17,20 +15,20 @@ public class UserMapper {
         return dto;
     }
 
-    public static User toUser(NewUserRequest newUserRequest) {
+    public static User toUser(UserDto userDto) {
         User user = new User();
-        user.setId(newUserRequest.getId());
-        user.setName(newUserRequest.getName());
-        user.setEmail(newUserRequest.getEmail());
+        user.setId(user.getId());
+        user.setName(user.getName());
+        user.setEmail(user.getEmail());
         return user;
     }
 
-    public static User updateUserFields(User user, UpdateUserRequest request) {
-        if (request.hasEmail()) {
-            user.setEmail(request.getEmail());
+    public static User updateUser(User user, UserDto dto) {
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            user.setName(dto.getName());
         }
-        if (request.hasName()) {
-            user.setName(request.getName());
+        if (dto.getEmail() != null && dto.getEmail().isBlank()) {
+            user.setEmail(dto.getEmail());
         }
         return user;
     }

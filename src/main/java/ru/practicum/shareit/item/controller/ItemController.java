@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.NewItemRequest;
-import ru.practicum.shareit.item.dto.UpdateItemRequest;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
@@ -20,15 +18,15 @@ public class ItemController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody NewItemRequest itemRequest) {
-        return itemService.createItem(userId, itemRequest);
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody ItemDto dto) {
+        return itemService.createItem(userId, dto);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto editItem(@RequestHeader("X-Sharer-User-Id") long userId,
                             @PathVariable("itemId") long itemId,
-                            @RequestBody UpdateItemRequest request) {
-        return itemService.editItem(userId, itemId, request);
+                            @RequestBody ItemDto dto) {
+        return itemService.editItem(userId, itemId, dto);
     }
 
     @GetMapping("/{itemId}")

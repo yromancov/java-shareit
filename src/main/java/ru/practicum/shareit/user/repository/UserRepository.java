@@ -8,16 +8,5 @@ import java.util.*;
 
 
 public interface UserRepository extends JpaRepository<User,Long> {
-
-//    public List<User> getUsers();
-//
-//    public Optional<User> getUserById(long userId);
-//
-//    public User createUser(User user);
-//
-//
-//    public User update(User newUser);
-//
-//    public void deleteUser(Long userId);
-
+    boolean existsByEmail(String email);
 }
