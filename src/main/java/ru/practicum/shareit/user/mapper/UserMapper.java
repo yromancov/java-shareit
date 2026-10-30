@@ -17,9 +17,8 @@ public class UserMapper {
 
     public static User toUser(UserDto userDto) {
         User user = new User();
-        user.setId(user.getId());
-        user.setName(user.getName());
-        user.setEmail(user.getEmail());
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
         return user;
     }
 
@@ -27,7 +26,7 @@ public class UserMapper {
         if (dto.getName() != null && !dto.getName().isBlank()) {
             user.setName(dto.getName());
         }
-        if (dto.getEmail() != null && dto.getEmail().isBlank()) {
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
             user.setEmail(dto.getEmail());
         }
         return user;

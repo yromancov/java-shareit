@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ParameterNotValidException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -28,7 +29,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemsByOwner(long userId) {
-        return itemRepository.findAllByOwnerIdOrderByID(userId)
+        return itemRepository.findAllByOwnerIdOrderById(userId)
                 .stream().map(ItemMapper::toItemDto)
                 .toList();
     }
@@ -47,6 +48,15 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(long userId, ItemDto dto) {
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь " + userId + " не найден"));
+        if (dto.getName() == null || dto.getName().isBlank()) {
+            throw new ParameterNotValidException("name", "не может быть пустым");
+        }
+        if (dto.getDescription() == null || dto.getDescription().isBlank()) {
+            throw new ParameterNotValidException("description", "не может быть пустым");
+        }
+        if (dto.getAvailable() == null) {
+            throw new ParameterNotValidException("available", "должен быть указан");
+        }
         Item item = ItemMapper.toItem(dto);
         item.setOwner(owner);
         return ItemMapper.toItemDto(itemRepository.save(item));

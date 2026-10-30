@@ -10,13 +10,13 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    List<Item> findAllByOwnerIdOrderByID(Long ownerId);
+    List<Item> findAllByOwnerIdOrderById(Long ownerId);
 
     @Query(
             "select i from Item as i " +
                     "where i.available = true " +
-                    "and (upper(i.name) like upper(concat('%',?1,'%'))) " +
-                    "or upper(i.description) like upper(concat('%',?1,'%'))"
+                    "and (upper(i.name) like upper(concat('%',?1,'%')) " +
+                    "or upper(i.description) like upper(concat('%',?1,'%')))"
     )
     List<Item> search(String text);
 }
