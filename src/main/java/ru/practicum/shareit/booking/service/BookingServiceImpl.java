@@ -75,7 +75,7 @@ public class BookingServiceImpl implements BookingService {
         userExist(bookerId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings = switch (state) {
-            case ALL -> bookingRepository.findAllByBookerOrderByStartDesc(bookerId);
+            case ALL -> bookingRepository.findAllByBookerIdOrderByStartDesc(bookerId);
             case CURRENT -> bookingRepository.findALLByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc
                     (bookerId, now, now);
             case PAST -> bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(bookerId, now);
