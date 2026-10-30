@@ -33,8 +33,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto createBooking(long bookerId, NewBookingDto dto) {
         Item item = itemRepository.findById(dto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена!"));
-        User user = userRepository.findById(bookerId)
-                .orElseThrow(() -> new NotFoundException("Пользователь " + bookerId + " не найден!"));
+        User user = userExist(bookerId);
         if (!item.getAvailable()) {
             throw new ParameterNotValidException("available", "вещь недоступна для бронирования");
         }
@@ -107,8 +106,8 @@ public class BookingServiceImpl implements BookingService {
                 .toList();
     }
 
-    private void userExist(Long userId) {
-        userRepository.findById(userId)
+    private User userExist(Long userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id: " + userId + " не существует"));
     }
 }
