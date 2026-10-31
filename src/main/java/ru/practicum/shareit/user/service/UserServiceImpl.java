@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.DuplicateDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ParameterNotValidException;
@@ -14,10 +15,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDto createUser(UserDto dto) {
         if (dto.getEmail() == null || dto.getEmail().isBlank()) {
             throw new ParameterNotValidException(dto.getEmail(), "email не может быть пустым");
@@ -46,6 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateUser(long userId, UserDto dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id= " + userId + " не найден"));
@@ -60,6 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(long userId) {
         userRepository.deleteById(userId);
     }

@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.dto.BookingDto;
 
@@ -35,9 +34,9 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    @ResponseStatus(HttpStatus.OK)
-    public BookingDto getBookingById(@PathVariable("bookingId") long bookingId) {
-        return bookingService.getBookingById(bookingId);
+    public BookingDto getBookingById(@RequestHeader("X-Sharer-User-Id") long userId,
+                                     @PathVariable("bookingId") long bookingId) {
+        return bookingService.getBookingById(userId, bookingId);
     }
 
     @GetMapping
@@ -46,10 +45,11 @@ public class BookingController {
                                                         @RequestParam(defaultValue = "ALL") BookingState state) {
         return bookingService.getBookingsByBooker(bookerId, state);
     }
+
     @GetMapping("/owner")
     @ResponseStatus(HttpStatus.OK)
     public List<BookingDto> getListBookingForItemOwner(@RequestHeader("X-Sharer-User-Id") long ownerId,
-                                                       @RequestParam(defaultValue = "ALL") BookingState state){
+                                                       @RequestParam(defaultValue = "ALL") BookingState state) {
         return bookingService.getBookingsByOwner(ownerId, state);
     }
 }
