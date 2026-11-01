@@ -3,11 +3,13 @@ package ru.practicum.shareit.booking.dto;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 public class NewBookingDto {
     @NotNull
     private Long itemId;

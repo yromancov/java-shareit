@@ -1,12 +1,17 @@
 package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "items")
@@ -14,10 +19,15 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
+    @NotNull
     @Column
     private String name;
+    @NotNull
+    @NotBlank
     @Column
     private String description;
+    @NotNull
     @Column(name = "is_available")
     private Boolean available;
     @ManyToOne(fetch = FetchType.LAZY)

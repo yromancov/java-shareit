@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
             throw new ParameterNotValidException(dto.getEmail(), "email не может быть пустым");
         }
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new DuplicateDataException("Этот email уже ипсользуется");
+            throw new DuplicateDataException("Этот email уже используется");
         }
         User user = UserMapper.toUser(dto);
         User saved = userRepository.save(user);
