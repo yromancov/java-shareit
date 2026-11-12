@@ -26,13 +26,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ErrorResponse handleConditionsNotMet(final ConditionsNotMetException e) {
-        log.warn("422 Необрабатываемая сущность: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleParameterNotValid(final ParameterNotValidException e) {
         log.warn("400 Ошибка валидации: {}", e.getMessage());
