@@ -15,7 +15,8 @@ import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.client.BaseClient;
 
 @Service
-public class BookingClient extends BaseClient {
+public class
+BookingClient extends BaseClient {
     private static final String API_PREFIX = "/bookings";
 
     @Autowired

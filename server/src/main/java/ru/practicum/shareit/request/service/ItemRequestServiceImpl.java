@@ -44,16 +44,14 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAllRequestsFromUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        userExist(userId);
         List<ItemRequest> requests = itemRequestRepository.findAllByRequestorIdOrderByCreatedDesc(userId);
         return getAllRequests(requests);
     }
 
     @Override
     public List<ItemRequestDto> getAllRequestsWithoutUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        userExist(userId);
         List<ItemRequest> requests = itemRequestRepository.findAllByRequestorIdNotOrderByCreatedDesc(userId);
         return getAllRequests(requests);
     }
@@ -90,5 +88,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                     return dto;
                 })
                 .toList();
+    }
+    private User userExist(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id: " + userId + " не существует"));
     }
 }
