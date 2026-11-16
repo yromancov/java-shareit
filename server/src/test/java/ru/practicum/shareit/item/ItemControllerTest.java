@@ -20,6 +20,7 @@ import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.exception.ParameterNotValidException;
 
 @WebMvcTest(ItemController.class)
 class ItemControllerTest {
@@ -103,5 +104,24 @@ class ItemControllerTest {
                         .content("{\"text\":\"Отлично\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.authorName").value("anna"));
+    }
+
+    @Test
+    void addCommentWithoutBooking() throws Exception {
+        when(itemService.addComment(anyLong(), anyLong(), any()))
+                .thenThrow(new ParameterNotValidException("itemId", "пользователь не брал эту вещь в аренду"));
+
+        mvc.perform(post("/items/1/comment").header(USER_HEADER, 2)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"text\":\"Отлично\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void unexpectedError() throws Exception {
+        when(itemService.getItemsByOwner(1L)).thenThrow(new RuntimeException("boom"));
+
+        mvc.perform(get("/items").header(USER_HEADER, 1))
+                .andExpect(status().isInternalServerError());
     }
 }

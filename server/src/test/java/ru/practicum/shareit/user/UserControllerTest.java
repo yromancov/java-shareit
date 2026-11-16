@@ -19,6 +19,8 @@ import ru.practicum.shareit.TestData;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.exception.DuplicateDataException;
+import ru.practicum.shareit.exception.NotFoundException;
 
 @WebMvcTest(UserController.class)
 class UserControllerTest {
@@ -82,5 +84,25 @@ class UserControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(userService).deleteUser(1L);
+    }
+
+    @Test
+    void createUserWithDuplicateEmail() throws Exception {
+        when(userService.createUser(any())).thenThrow(new DuplicateDataException("Этот email уже используется"));
+
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(user())))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error").value("Этот email уже используется"));
+    }
+
+    @Test
+    void getUnknownUser() throws Exception {
+        when(userService.getUserById(99L)).thenThrow(new NotFoundException("Пользователь не найден"));
+
+        mvc.perform(get("/users/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Пользователь не найден"));
     }
 }

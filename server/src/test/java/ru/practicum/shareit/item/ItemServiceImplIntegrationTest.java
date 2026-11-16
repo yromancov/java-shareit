@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,8 @@ import ru.practicum.shareit.request.dto.NewItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ParameterNotValidException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -109,5 +112,85 @@ class ItemServiceImplIntegrationTest {
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getAuthorName()).isEqualTo("booker");
         assertThat(saved.getCreated()).isNotNull();
+    }
+
+    @Test
+    void createItemWithInvalidFields() {
+        ItemDto noName = TestData.item("x");
+        noName.setName(null);
+        ItemDto noDescription = TestData.item("x");
+        noDescription.setDescription(" ");
+        ItemDto noAvailable = TestData.item("x");
+        noAvailable.setAvailable(null);
+
+        assertThatThrownBy(() -> itemService.createItem(owner.getId(), noName))
+                .isInstanceOf(ParameterNotValidException.class);
+        assertThatThrownBy(() -> itemService.createItem(owner.getId(), noDescription))
+                .isInstanceOf(ParameterNotValidException.class);
+        assertThatThrownBy(() -> itemService.createItem(owner.getId(), noAvailable))
+                .isInstanceOf(ParameterNotValidException.class);
+        assertThatThrownBy(() -> itemService.createItem(999L, TestData.item("x")))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void createItemWithUnknownRequest() {
+        ItemDto dto = TestData.item("Drill 2");
+        dto.setRequestId(999L);
+
+        assertThatThrownBy(() -> itemService.createItem(owner.getId(), dto))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void editItem() {
+        ItemDto patch = new ItemDto();
+        patch.setName("Drill PRO");
+        patch.setDescription("new description");
+        patch.setAvailable(false);
+
+        ItemDto updated = itemService.editItem(owner.getId(), item.getId(), patch);
+
+        assertThat(updated.getName()).isEqualTo("Drill PRO");
+        assertThat(updated.getDescription()).isEqualTo("new description");
+        assertThat(updated.getAvailable()).isFalse();
+    }
+
+    @Test
+    void editItemByNotOwner() {
+        assertThatThrownBy(() -> itemService.editItem(booker.getId(), item.getId(), new ItemDto()))
+                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> itemService.editItem(owner.getId(), 999L, new ItemDto()))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void searchItems() {
+        assertThat(itemService.searchItems("dRiLl")).hasSize(1);
+        assertThat(itemService.searchItems(" ")).isEmpty();
+    }
+
+    @Test
+    void getItemsByOwnerWithoutItems() {
+        assertThat(itemService.getItemsByOwner(booker.getId())).isEmpty();
+    }
+
+    @Test
+    void getItemByIdForNotOwner() {
+        approvedBooking(now.minusDays(3), now.minusDays(2));
+
+        assertThat(itemService.getItemById(booker.getId(), item.getId()).getLastBooking()).isNull();
+        assertThatThrownBy(() -> itemService.getItemById(owner.getId(), 999L))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void addCommentWithoutBooking() {
+        assertThatThrownBy(() -> itemService.addComment(booker.getId(), item.getId(), comment("text")))
+                .isInstanceOf(ParameterNotValidException.class);
+        assertThatThrownBy(() -> itemService.addComment(booker.getId(), 999L, comment("text")))
+                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> itemService.addComment(999L, item.getId(), comment("text")))
+                .isInstanceOf(NotFoundException.class);
     }
 }

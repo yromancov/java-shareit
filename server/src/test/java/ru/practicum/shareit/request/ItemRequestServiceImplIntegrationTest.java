@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
@@ -19,6 +20,8 @@ import ru.practicum.shareit.request.dto.NewItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ParameterNotValidException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -93,5 +96,26 @@ class ItemRequestServiceImplIntegrationTest {
 
         assertThat(result.getDescription()).isEqualTo("Нужна дрель");
         assertThat(result.getItems()).hasSize(1);
+    }
+
+    @Test
+    void createRequestsWithInvalidData() {
+        assertThatThrownBy(() -> request(requestor.getId(), " "))
+                .isInstanceOf(ParameterNotValidException.class);
+        assertThatThrownBy(() -> request(999L, "Нужна дрель"))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void getAllRequestsFromUserWithoutRequests() {
+        assertThat(itemRequestService.getAllRequestsFromUser(requestor.getId())).isEmpty();
+    }
+
+    @Test
+    void getRequestsForUnknownData() {
+        assertThatThrownBy(() -> itemRequestService.getRequestById(999L))
+                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> itemRequestService.getAllRequestsFromUser(999L))
+                .isInstanceOf(NotFoundException.class);
     }
 }
